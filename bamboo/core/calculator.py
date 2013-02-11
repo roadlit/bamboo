@@ -43,6 +43,24 @@ class Calculator(object):
 
         return aggregation
 
+    def calculate_columns(self, calculations):
+        self._ensure_dframe()
+        new_dframe = self.dframe
+
+        for c in calculations:
+            column = self.calculate_column(c.formula, c.name, c.groups_as_list)
+
+            if column is not None:
+                new_dframe = new_dframe.join(column)
+
+        if len(new_dframe.columns) > len(self.dframe.columns):
+            self.dataset.replace_observations(new_dframe)
+
+        # propagate calculation to any merged child datasets
+        for merged_dataset in self.dataset.merged_datasets:
+            merged_calculator = Calculator(merged_dataset)
+            merged_calculator.propagate_column(self.dataset)
+
     def calculate_column(self, formula, name, groups=None):
         """Calculate a new column based on `formula` store as `name`.
 
@@ -65,21 +83,14 @@ class Calculator(object):
         :param groups: A list of columns to group on for aggregate
             calculations.
         """
-        self._ensure_dframe()
-
         aggregation, new_columns = self.make_columns(formula, name)
 
         if aggregation:
-            agg = Aggregator(self.dataset, self.dataset.dframe(),
+            agg = Aggregator(self.dataset, self.dframe,
                              groups, aggregation, name)
             agg.save(new_columns)
         else:
-            self.dataset.replace_observations(self.dframe.join(new_columns[0]))
-
-        # propagate calculation to any merged child datasets
-        for merged_dataset in self.dataset.merged_datasets:
-            merged_calculator = Calculator(merged_dataset)
-            merged_calculator.propagate_column(self.dataset)
+            return new_columns[0]
 
     def dependent_columns(self):
         return self.parser.context.dependent_columns
@@ -242,22 +253,13 @@ class Calculator(object):
 
     def _update_merged_datasets(self, new_data, labels_to_slugs):
         # store slugs as labels for child datasets
-        slugified_data = []
-
-        if not isinstance(new_data, list):
-            new_data = [new_data]
-
-        for row in new_data:
-            for key, value in row.iteritems():
-                if labels_to_slugs.get(key) and key not in MONGO_RESERVED_KEYS:
-                    del row[key]
-                    row[labels_to_slugs[key]] = value
-
-            slugified_data.append(row)
+        slugified_data = self._slugify_data(new_data, labels_to_slugs)
 
         # update the merged datasets with new_dframe
-        for merged_dataset in self.dataset.merged_datasets:
+        for mapping, merged_dataset in self.dataset.merged_datasets_with_map:
             merged_calculator = Calculator(merged_dataset)
+
+            slugified_data = self._remapped_data(mapping, slugified_data)
             merged_calculator.calculate_updates(
                 merged_calculator,
                 slugified_data,
@@ -287,8 +289,8 @@ class Calculator(object):
 
                 joined_calculator = Calculator(joined_dataset)
                 joined_calculator.calculate_updates(
-                           joined_calculator, merged_dframe.to_jsondict(),
-                           parent_dataset_id=self.dataset.dataset_id)
+                    joined_calculator, merged_dframe.to_jsondict(),
+                    parent_dataset_id=self.dataset.dataset_id)
 
     def dframe_from_update(self, new_data, labels_to_slugs):
         """Make a single-row dataframe for the additional data to add."""
@@ -402,6 +404,31 @@ class Calculator(object):
         return [
             item for sublist in calcs_to_data.values() for item in sublist
         ]
+
+    def _slugify_data(self, new_data, labels_to_slugs):
+        slugified_data = []
+
+        if not isinstance(new_data, list):
+            new_data = [new_data]
+
+        for row in new_data:
+            for key, value in row.iteritems():
+                if labels_to_slugs.get(key) and key not in MONGO_RESERVED_KEYS:
+                    del row[key]
+                    row[labels_to_slugs[key]] = value
+
+            slugified_data.append(row)
+
+        return slugified_data
+
+    def _remapped_data(self, mapping, slugified_data):
+        column_map = mapping.get(self.dataset.dataset_id) if mapping else None
+
+        if column_map:
+            slugified_data = [{column_map.get(k, k): v for k, v in row.items()}
+                              for row in slugified_data]
+
+        return slugified_data
 
     def __getstate__(self):
         """Get state for pickle."""

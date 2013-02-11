@@ -56,6 +56,22 @@ class TestDatasets(TestAbstractDatasets):
         results = self._test_summary_built(result)
         self._test_summary_no_group(results)
 
+    def test_create_from_csv_mixed_col(self):
+        dframe_length = 8
+        _file_name = 'good_eats_mixed.csv'
+        self._file_path = self._file_path.replace(self._file_name, _file_name)
+        result = self._upload_mocked_file()
+
+        self.assertTrue(isinstance(result, dict))
+        self.assertTrue(Dataset.ID in result)
+
+        dataset = Dataset.find_one(result[Dataset.ID])
+
+        self.assertEqual(Dataset.STATE_READY, dataset.state)
+        self.assertEqual(dframe_length, len(dataset.dframe()))
+
+        self._test_summary_built(result)
+
     def test_create_from_file_for_nan_float_cell(self):
         """First data row has one cell blank, which is usually interpreted
         as nan, a float value."""
@@ -518,7 +534,6 @@ class TestDatasets(TestAbstractDatasets):
                          left_dataset.joined_dataset_ids)
         self.assertEqual([('left', left_dataset_id, on, joined_dataset_id)],
                          right_dataset.joined_dataset_ids)
-
 
     def test_join_datasets_non_unique_rhs(self):
         left_dataset_id = self._post_file()

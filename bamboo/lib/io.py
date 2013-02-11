@@ -51,7 +51,6 @@ def _file_reader(name, delete=False):
             os.unlink(name)
 
 
-
 class ImportableDataset(object):
     def import_from_url(self, url, allow_local_file=False):
         """Load a URL, read from a CSV, add data to dataset.
@@ -68,10 +67,10 @@ class ImportableDataset(object):
                 and url[0:4] == 'file':
             raise IOError
 
-        call_async(import_dataset, self, file_reader=partial(_file_reader, url))
+        call_async(
+            import_dataset, self, file_reader=partial(_file_reader, url))
 
         return self
-
 
     def import_from_csv(self, csv_file):
         """Import data from a CSV file.
@@ -92,11 +91,10 @@ class ImportableDataset(object):
         # pandas needs a closed file for *read_csv*
         tmpfile.close()
 
-        call_async(import_dataset, self,
-                   file_reader=partial(_file_reader, tmpfile.name, delete=True))
+        call_async(import_dataset, self, file_reader=partial(
+            _file_reader, tmpfile.name, delete=True))
 
         return self
-
 
     def import_from_json(self, json_file):
         """Impor data from a JSON file.
@@ -113,7 +111,6 @@ class ImportableDataset(object):
                    file_reader=partial(file_reader, content))
 
         return self
-
 
     def import_schema(self, schema):
         """Create a dataset from a SDF schema file (JSON).
