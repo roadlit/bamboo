@@ -246,25 +246,35 @@ class Datasets(AbstractController):
             the dataset will not be fully loaded until its state is set to
             ready.
         """
+        print '>>> IN controller.create()'
         result = None
         error = 'url, csv_file or schema required'
 
         try:
             if schema or url or csv_file or json_file:
+                print 'schema, url, csv_file, or json_file exists, creating dataset'
                 dataset = Dataset()
+                print 'dataset created'
                 dataset.save()
+                print 'dataset saved'
 
                 if schema:
+                    print 'found schema, importing schema'
                     dataset.import_schema(schema)
+                    print 'done importing schema'
 
                 if url:
+                    print 'found url, importing from %s' % url
                     dataset.import_from_url(url)
                 elif csv_file:
+                    print 'found csv_file, importing from file'
                     dataset.import_from_csv(csv_file)
                 elif json_file:
+                    print 'found json_file, import from json'
                     dataset.import_from_json(json_file)
 
                 result = {Dataset.ID: dataset.dataset_id}
+                print 'dataset_id = %s' % dataset.dataset_id
 
             perish = parse_int(perish, None)
             if perish:
@@ -275,6 +285,7 @@ class Datasets(AbstractController):
             error = 'could not get a filehandle for: %s' % csv_file
 
         self.set_response_params(result, success_status_code=201)
+        print '<<< OUT controller.create()'
         return self.dump_or_error(result, error)
 
     def update(self, dataset_id, update):

@@ -25,17 +25,21 @@ def import_dataset(dataset, dframe=None, file_reader=None):
     :param filepath_or_buffer: Link to file to import, default None.
     :param delete: Delete filepath_or_buffer after import, default False.
     """
+    print '>>> IN import_dataset()'
     try:
         if file_reader:
             dframe = file_reader()
 
+        print 'saving observations'
         dataset.save_observations(dframe)
+        print 'done saving observations'
     except Exception as e:
         if isinstance(e, RetryTaskError):
             raise e
         else:
             dataset.failed(e.__str__())
             dataset.delete(countdown=86400)
+    print '<<< OUT import_dataset()'
 
 
 def _file_reader(name, delete=False):

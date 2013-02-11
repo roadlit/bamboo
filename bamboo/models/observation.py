@@ -77,23 +77,33 @@ class Observation(AbstractModel):
         :param dataset: The dataset to store the dframe in.
         """
         # build schema for the dataset after having read it from file.
+        print '>>> IN Observation.save()'
         if not dataset.schema:
+            print 'dataset.schema not set, building schema'
             dataset.build_schema(dframe)
+            print 'finished building schema'
 
         # save the data, if there is any
         num_rows = 0
 
         if dframe is not None:
+            print 'dframe is not None, saving dframe'
             if not DATASET_OBSERVATION_ID in dframe.columns:
+                print 'observation id is not in dframe.columns, adding id column to dframe'
                 dframe = dataset.add_id_column_to_dframe(dframe)
 
+            print 'calling batch save on dframe'
             self.batch_save(dframe)
+            print 'batch save finished'
             num_rows = len(dframe)
 
         # add metadata to dataset, discount ID column
+        print 'adding metadata to dataset'
         dataset.update({
             dataset.NUM_ROWS: num_rows,
             dataset.STATE: self.STATE_READY,
         })
 
+        print 'summarizing dataset'
         dataset.summarize()
+        print '<<< OUT Observation.save()'
