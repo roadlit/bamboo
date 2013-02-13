@@ -172,7 +172,7 @@ class AbstractModel(object):
             print 'starting batch #%s' % batches
             start = batch * batch_size
             end = start + batch_size
-            print 'retrieving records %s' % end - start
+            print 'retrieving records %s' % (end - start)
             records = [
                 row.to_dict() for (_, row) in dframe[start:end].iterrows()]
             print 'got records, running command: %s' % command

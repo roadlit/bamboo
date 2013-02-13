@@ -84,12 +84,13 @@ class Observation(AbstractModel):
             num_rows = len(dframe)
 
         # add metadata to dataset, discount ID column
+
+        print 'summarizing dataset'
+        dataset.summarize(dframe=dframe)
+
         print 'adding metadata to dataset'
         dataset.update({
             dataset.NUM_ROWS: num_rows,
             dataset.STATE: self.STATE_READY,
         })
-
-        print 'summarizing dataset'
-        dataset.summarize()
         print '<<< OUT Observation.save()'

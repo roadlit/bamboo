@@ -69,7 +69,9 @@ def summarize_with_groups(dframe, groups, dataset):
 
 def summarize(dataset, dframe, groups, group_str, no_cache):
     """Raises a ColumnTypeError if grouping on a non-dimensional column."""
+    print '>>> IN core.summary.summarize()'
     # do not allow group by numeric types
+    print 'checking groups'
     for group in groups:
         if group != dataset.ALL and not dataset.schema.is_dimension(group):
             raise ColumnTypeError("group: '%s' is not a dimension." % group)
@@ -77,14 +79,17 @@ def summarize(dataset, dframe, groups, group_str, no_cache):
     # check cached stats for group and update as necessary
     stats = dataset.stats
     if no_cache or not stats.get(group_str):
+        print 'no cache/previous stats, calling summarize_df()'
         group_stats = summarize_df(dframe, dataset=dataset) if\
             group_str == dataset.ALL else\
             summarize_with_groups(dframe, groups, dataset)
+        print 'finished summarizing, updating stats record'
         stats.update({group_str: group_stats})
         if not no_cache:
             dataset.update({dataset.STATS: dict_for_mongo(stats)})
 
     stats_to_return = dict_from_mongo(stats.get(group_str))
 
+    print '<<< OUT core.summary.summarize()'
     return stats_to_return if group_str == dataset.ALL else {
         group_str: stats_to_return}
