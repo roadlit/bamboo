@@ -41,8 +41,8 @@ def import_dataset(dataset, dframe=None, file_reader=None):
 def _file_reader(name, delete=False):
     try:
         return BambooFrame(
-            #pd.read_csv(name)).recognize_dates()
-            pd.read_csv(name, encoding='utf-8')).recognize_dates()
+            pd.read_csv(name)).recognize_dates()
+            #pd.read_csv(name, encoding='utf-8')).recognize_dates()
     finally:
         if delete:
             os.unlink(name)
