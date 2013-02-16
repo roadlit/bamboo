@@ -164,21 +164,14 @@ class AbstractModel(object):
 
     @classmethod
     def _batch_command(cls, command, dframe, batch_size):
-        print '>>> IN _batch_comand()'
         batches = int(ceil(float(len(dframe)) / batch_size))
-        print '%s  batches' % batches
 
         for batch in xrange(0, batches):
-            print 'starting batch #%s' % batches
             start = batch * batch_size
             end = start + batch_size
-            print 'retrieving records %s' % (end - start)
             records = [
                 row.to_dict() for (_, row) in dframe[start:end].iterrows()]
-            print 'got records, running command: %s' % command
             command(records)
-            print 'finished running command'
-        print '<<< OUT _batch_comand()'
 
     def __init__(self, record=None):
         """Instantiate with data in `record`."""

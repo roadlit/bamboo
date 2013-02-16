@@ -324,7 +324,6 @@ class Dataset(AbstractModel, ImportableDataset):
             summarized by the arithmetic mean, standard deviation, and
             percentiles. Dimensional columns will be summarized by counts.
         """
-        print '>>> IN dataset.summarize()'
         # interpret none as all
         if not group_str:
             group_str = self.ALL
@@ -337,19 +336,15 @@ class Dataset(AbstractModel, ImportableDataset):
             select.update(dict(zip(groups, [1] * len(groups))))
 
         self.reload()
-        print 'loading dframe'
         if dframe is None:
             dframe = self.dframe(query=query, select=select,
                                  limit=limit, order_by=order_by)
-#        else: # we have it, just remove unwanted stuff
-#            dframe = BambooFrame(dframe)
-#            dframe.decode_mongo_reserved_keys()
-#            dframe.remove_bamboo_reserved_keys()
+        else: # we have it, just remove unwanted stuff
+            dframe = BambooFrame(dframe)
+            dframe.decode_mongo_reserved_keys()
+            dframe.remove_bamboo_reserved_keys()
 
-        print 'calling summarize()'
-        summary = summarize(self, dframe, groups, group_str, query or select)
-        print '<<< OUT dataset.summarize()'
-        return summary
+        return summarize(self, dframe, groups, group_str, query or select)
 
     @classmethod
     def create(cls, dataset_id=None):
@@ -479,9 +474,7 @@ class Dataset(AbstractModel, ImportableDataset):
 
     def save_observations(self, dframe):
         """Save rows in `dframe` for this dataset."""
-        print "before saving observations"
         Observation.save(dframe, self)
-        print "ready to return saved observations"
 
     def replace_observations(self, dframe, overwrite=False,
                              set_num_columns=True):
