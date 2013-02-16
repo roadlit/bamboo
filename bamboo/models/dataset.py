@@ -336,13 +336,15 @@ class Dataset(AbstractModel, ImportableDataset):
             select.update(dict(zip(groups, [1] * len(groups))))
 
         self.reload()
-        if dframe is None:
-            dframe = self.dframe(query=query, select=select,
-                                 limit=limit, order_by=order_by)
-        else: # we have it, just remove unwanted stuff
-            dframe = BambooFrame(dframe)
-            dframe.decode_mongo_reserved_keys()
-            dframe.remove_bamboo_reserved_keys()
+        dframe = self.dframe(query=query, select=select,
+                             limit=limit, order_by=order_by)
+#        if dframe is None:
+#            dframe = self.dframe(query=query, select=select,
+#                                 limit=limit, order_by=order_by)
+#        else: # we have it, just remove unwanted stuff
+#            dframe = BambooFrame(dframe)
+#            dframe.decode_mongo_reserved_keys()
+#            dframe.remove_bamboo_reserved_keys()
 
         return summarize(self, dframe, groups, group_str, query or select)
 

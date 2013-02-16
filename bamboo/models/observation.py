@@ -78,7 +78,8 @@ class Observation(AbstractModel):
 
         # add metadata to dataset, discount ID column
 
-        dataset.summarize(dframe=dframe)
+        dataset.summarize()
+        #dataset.summarize(dframe=dframe)
 
         dataset.update({
             dataset.NUM_ROWS: num_rows,
