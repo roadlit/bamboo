@@ -163,6 +163,7 @@ class AbstractModel(object):
                 del record['MONGO_RESERVED_KEY_id']
                 doc = {"$set": record}
                 cls.collection.update(spec, doc)
+                #cls.collection.find_and_modify(spec, doc)
 
         batch_size = cls.DB_SAVE_BATCH_SIZE
 
