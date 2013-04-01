@@ -20,4 +20,4 @@ simplejson==2.6.1
 Routes==1.13
 
 #debugging
-memory_profiler
+memory-profiler
