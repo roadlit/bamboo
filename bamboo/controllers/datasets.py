@@ -372,7 +372,8 @@ class Datasets(AbstractController):
                 }
 
         return self._safe_get_and_call(
-            dataset_id, action, exceptions=(KeyError, NonUniqueJoinError))
+            dataset_id, action, exceptions=(KeyError,
+                                            NonUniqueJoinError, Exception))
 
     def resample(self, dataset_id, date_column, interval, how='mean',
                  query={}, format=None):
