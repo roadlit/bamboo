@@ -1,0 +1,185 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Bamboo by modilabs</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Bamboo</h1>
+        <p>Dynamic data analysis over the web. The logic to your data dashboards.</p>
+
+        <p class="view"><a href="https://github.com/modilabs/bamboo">View the Project on GitHub <small>modilabs/bamboo</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/modilabs/bamboo/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/modilabs/bamboo/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/modilabs/bamboo">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>bamboo</h1>
+
+<p><a href="http://travis-ci.org/modilabs/bamboo"><img src="https://secure.travis-ci.org/modilabs/bamboo.png?branch=master"></a></p>
+
+<p><em>bamboo</em> is an application that systematizes realtime data analysis. <em>bamboo</em>
+provides an interface for merging, aggregating and adding algebraic
+calculations to dynamic datasets.  Clients can interact with <em>bamboo</em> through a
+a REST web interface and through Python.</p>
+
+<p><em>bamboo</em> supports a simple querying language to build calculations
+(e.g. student teacher ratio) and aggregations (e.g. average number of students
+per district) from datasets. These are updated as new data is received.</p>
+
+<p><em>bamboo</em> uses <a href="http://pandas.pydata.org/">pandas</a> for data analysis,
+<a href="http://pyparsing.wikispaces.com/">pyparsing</a> to read formulas, and <a href="http://www.mongodb.org/">mongodb</a> to serialize data.</p>
+
+<p><img src="https://farm4.staticflickr.com/3363/3419345800_2c6c4133d3_z.jpg?zz=1" alt="panda bears"></p>
+
+<p><em>bamboo</em> is <a href="https://github.com/modilabs/bamboo">open source</a> software released
+under the 3-clause BSD license, which is also known as the "Modified BSD
+License".</p>
+
+<h2>Dependencies</h2>
+
+<ul>
+<li>python (tested on version 2.7)</li>
+<li>mongodb</li>
+</ul><h3>for numpy, pandas, and scipy:</h3>
+
+<p>On Arch Linux: <code># pacman -S blas lapack gcc-fortran</code>.</p>
+
+<p>On Debian based: <code># apt-get install gfortran libatlas-base-dev</code>.</p>
+
+<h2>Using as a Python Libary</h2>
+
+<h3>Installation</h3>
+
+<div class="highlight"><pre>    <span class="nv">$ </span>pip install bamboo-server
+</pre></div>
+
+<p>Python pip package for <a href="http://pypi.python.org/pypi/bamboo-server">bamboo</a>.</p>
+
+<p>For creating plots: <code>$ pip install matplotlib</code>.</p>
+
+<h2>Usage</h2>
+
+<div class="highlight"><pre>    <span class="kn">import</span> <span class="nn">bamboo</span> <span class="kn">as</span> <span class="nn">bm</span>
+
+    <span class="n">bf</span> <span class="o">=</span> <span class="n">bm</span><span class="o">.</span><span class="n">BambooFrame</span><span class="p">([{</span><span class="s">'date'</span><span class="p">:</span> <span class="s">'2012-12-21'</span><span class="p">}])</span>
+    <span class="n">bff</span> <span class="o">=</span> <span class="n">bf</span><span class="o">.</span><span class="n">recognize_dates</span><span class="p">()</span>
+    <span class="n">bff</span><span class="o">.</span><span class="n">to_json</span><span class="p">()</span>
+
+    <span class="o">&gt;&gt;&gt;</span> <span class="s">'[{"date": {"$date": 1356048000000}}]'</span>
+
+    <span class="c"># Turn asyncronous processing off</span>
+    <span class="n">bm</span><span class="o">.</span><span class="n">set_async</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+
+    <span class="n">url</span> <span class="o">=</span> <span class="s">'http://formhub.org/mberg/forms/good_eats/data.csv'</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">bm</span><span class="o">.</span><span class="n">Dataset</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+    <span class="n">dataset</span><span class="o">.</span><span class="n">import_from_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">na_values</span><span class="o">=</span><span class="p">[</span><span class="s">'n/a'</span><span class="p">])</span>
+    <span class="n">dataset</span><span class="o">.</span><span class="n">schema</span>
+
+    <span class="o">&gt;&gt;&gt;</span> <span class="p">{</span><span class="s">u'_gps_altitude'</span><span class="p">:</span> <span class="p">{</span><span class="s">u'cardinality'</span><span class="p">:</span> <span class="mi">14</span><span class="p">,</span> <span class="s">u'label'</span><span class="p">:</span> <span class="s">u'_gps_altitude'</span><span class="p">,</span> <span class="o">...</span>
+
+    <span class="c"># Resample monthly, 'M', aggregating by mean</span>
+    <span class="n">date_column</span> <span class="o">=</span> <span class="s">'submit_date'</span>
+    <span class="n">monthly</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">date_column</span><span class="p">,</span> <span class="s">'M'</span><span class="p">,</span> <span class="s">'mean'</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">date_column</span><span class="p">)</span>
+    <span class="n">monthly_amounts</span> <span class="o">=</span> <span class="n">monthly</span><span class="o">.</span><span class="n">amount</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+
+    <span class="c"># Plot the amount spent per month</span>
+    <span class="n">mothly_amounts</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+
+<p><img src="https://raw.github.com/modilabs/bamboo/master/docs/images/amount.png" alt="amount chart"></p>
+
+<h2>Installation</h2>
+
+<div class="highlight"><pre>    <span class="nv">$ </span>./scripts/install.sh
+</pre></div>
+
+<h2>Example Usage</h2>
+
+<h3>On the remote server</h3>
+
+<p>running the example basic commands</p>
+
+<div class="highlight"><pre>    <span class="nv">$ </span>./scripts/commands.sh
+</pre></div>
+
+<p>using <a href="http://modilabs.github.com/bamboo_js/">bamboo.JS</a></p>
+
+<div class="highlight"><pre>    <span class="kd">var</span> <span class="nx">dataset</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">bamboo</span><span class="p">.</span><span class="nx">Dataset</span><span class="p">({</span><span class="nx">url</span><span class="o">:</span> <span class="s1">'http://bitly.com/ZfzBwP'</span><span class="p">});</span>
+    <span class="nx">bamboo</span><span class="p">.</span><span class="nx">dataset_exists</span><span class="p">(</span><span class="s1">'nonexistentdataset_id'</span><span class="p">);</span>
+    <span class="nx">dataset</span><span class="p">.</span><span class="nx">query_info</span><span class="p">();</span>
+    <span class="p">...</span>
+</pre></div>
+
+<p>using <a href="https://github.com/modilabs/pybamboo">pybamboo</a></p>
+
+<div class="highlight"><pre>    <span class="kn">from</span> <span class="nn">pybamboo</span> <span class="kn">import</span> <span class="n">PyBamboo</span>
+    <span class="n">pybamboo</span> <span class="o">=</span> <span class="n">PyBamboo</span><span class="p">()</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">pybamboo</span><span class="o">.</span><span class="n">store_csv_file</span><span class="p">(</span><span class="s">'http://formhub.org/mberg/forms/good_eats/data.csv'</span><span class="p">)</span>
+    <span class="n">dataset_id</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="s">'id'</span><span class="p">]</span>
+    <span class="o">...</span>
+</pre></div>
+
+<p>posting a dataset</p>
+
+<div class="highlight"><pre>    <span class="nv">$ </span>curl -X POST -d <span class="s2">"url=http://formhub.org/mberg/forms/good_eats/data.csv"</span> http://bamboo.io/datasets
+</pre></div>
+
+<h2>Documentation</h2>
+
+<h3>Viewing Documentation</h3>
+
+<p>The latest docs are available at <a href="http://bamboo.io/"></a></p>
+
+<h2>About</h2>
+
+<p>Join the <a href="https://groups.google.com/forum/#!forum/bamboo-dev">bamboo-dev mailing list</a>.</p>
+
+<p><em>bamboo</em> is an open source project. The project features, in chronological order,
+the combined efforts of</p>
+
+<ul>
+<li>Peter Lubell-Doughtie</li>
+<li>Mark Johnston</li>
+<li>Prabhas Pokharel</li>
+<li>Renaud Gaudin</li>
+<li>Myf Ma</li>
+<li>Ukang'a Dickson</li>
+<li>Larry Weya</li>
+</ul><p>and other developers.</p>
+
+<h2>Projects using <em>bamboo</em>
+</h2>
+
+<ul>
+<li>
+<a href="http://bamboo.io">bamboo.io</a> - The bamboo.io web service API</li>
+<li>
+<a href="https://formhub.org">formhub</a> - Mobile Data Collection made easy</li>
+<li>
+<a href="http://www.africasoils.net/">AFSIS</a> - Africa Soil Information Service</li>
+</ul><p>Is your project using bamboo? <a href="https://groups.google.com/forum/#!forum/bamboo-dev">Let us know</a>!</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/modilabs">modilabs</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
