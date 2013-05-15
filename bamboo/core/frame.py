@@ -45,7 +45,7 @@ class BambooFrame(DataFrame):
 
             self.rename(columns={'index': INDEX}, inplace=True)
 
-        return self.__class__(self)
+        return BambooFrame(self)
 
     def add_id_column(self, dataset_id):
         return self.add_constant_column(dataset_id, DATASET_ID) if not\
