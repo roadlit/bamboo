@@ -86,8 +86,7 @@ def connect_routes(dispatcher):
     }
 
     # map them into args to dispatcher
-    dictify = lambda x: dict(zip(
-        ['name', 'conditions', 'route', 'controller', 'action'], x))
+    dictify = lambda x: dict(zip(['name', 'conditions', 'route', 'controller', 'action'], x))
     route_case = {
         'conditions': lambda v: dict(method=v),
         'controller': lambda v: controllers[v],

@@ -44,7 +44,7 @@ On Debian based: ``# apt-get install gfortran libatlas-base-dev``.
 
 On Mac OS X: ``$ brew install gfortran``.
 
-Using as a Python Libary
+Using as a Python Library
 ------------------------
 
 Installation

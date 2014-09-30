@@ -1,9 +1,10 @@
-from bson import json_util
+
 import numpy as np
 import simplejson as json
 
 from bamboo.lib.mongo import dump_mongo_json
 from bamboo.lib.utils import is_float_nan
+from bson import json_util
 
 
 # JSON encoding string

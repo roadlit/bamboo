@@ -13,10 +13,10 @@ DAEMON_ARGS="-i run_server -c $PROJECT_DIR/current/bamboo/config/prod.conf -p $P
 
 # load the virtualenv
 echo "Loading virtualenv 'bamboo'..."
-. $VENV_DIR/activate
+#. $VENV_DIR/activate
 
 # Exit if the package is not installed
-[ -x "$DAEMON" ] || exit 0
+#[ -x "$DAEMON" ] || exit 0
 
 #
 # Function that starts the daemon/service

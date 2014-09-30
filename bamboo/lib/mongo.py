@@ -2,9 +2,7 @@ from base64 import b64encode
 from numpy import datetime64
 import simplejson as json
 import re
-
 from bson import json_util
-
 
 # _id is reserved by MongoDB
 MONGO_RESERVED_KEY_PREFIX = '##'

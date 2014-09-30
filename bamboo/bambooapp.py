@@ -2,8 +2,8 @@
 
 import sys
 sys.stdout = sys.stderr
-sys.path.append('/var/www/bamboo/current')
-sys.path.append('/var/www/bamboo/current/bamboo')
+sys.path.append('/projects/OpenSource/bamboo')
+sys.path.append('/projects/OpenSource/bamboo/bamboo')
 
 import cherrypy
 

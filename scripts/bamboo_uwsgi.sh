@@ -35,6 +35,7 @@ if [ -f /etc/default/bamboo_uwsgi ]
     source /etc/default/bamboo_uwsgi
 fi
 
+
 # Exit if the package is not installed
 [ -x "$DAEMON" ] || exit 0
 
